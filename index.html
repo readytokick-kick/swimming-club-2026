@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>내 수영 MBTI는? | SWIMMING CLUB 2026</title>
+  <meta property="og:title" content="내 수영 MBTI는? | SWIMMING CLUB 2026" />
+  <meta property="og:description" content="나는 수영 덕후? 친목파? 힐링파? 나의 수영 유형을 알아보세요! 🏊" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <!-- 카카오 SDK: developers.kakao.com에서 앱 키 발급 후 아래 YOUR_KAKAO_APP_KEY 교체 -->
+  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --yellow: #FFE800;
+      --red:    #FF0000;
+      --blue:   #0000FF;
+      --black:  #000000;
+      --white:  #FFFFFF;
+      --gray:   #F5F5F5;
+      --gray2:  #E0E0E0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: var(--white);
+      color: var(--black);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      background: var(--white);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ── SCREENS ── */
+    .screen { display: none; min-height: 100vh; flex-direction: column; }
+    .screen.active { display: flex; }
+
+    /* ── INTRO ── */
+    #intro {
+      background: var(--blue);
+      color: var(--white);
+      padding: 36px 28px 36px;
+      justify-content: space-between;
+    }
+    .intro-top { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; }
+    .brand-tag {
+      display: inline-block;
+      border: 2px solid rgba(255,255,255,.4);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      width: fit-content;
+    }
+    .intro-emoji { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 24px; display: block; }
+    .intro-title {
+      font-size: 34px;
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+    .intro-title span { color: var(--yellow); }
+    .intro-desc {
+      font-size: 15px;
+      line-height: 1.7;
+      opacity: .8;
+      margin-bottom: 48px;
+    }
+    .intro-types {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 48px;
+    }
+    .type-chip {
+      background: rgba(255,255,255,.15);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .btn-start {
+      width: 100%;
+      padding: 18px;
+      background: var(--yellow);
+      color: var(--black);
+      border: none;
+      border-radius: 14px;
+      font-size: 17px;
+      font-weight: 900;
+      cursor: pointer;
+      letter-spacing: -.3px;
+      transition: transform .1s;
+    }
+    .btn-start:active { transform: scale(.97); }
+
+    /* ── QUESTION ── */
+    #question { padding: 0; justify-content: flex-start; }
+
+    .q-header {
+      padding: 20px 24px 16px;
+      border-bottom: 2px solid var(--black);
+      position: sticky;
+      top: 0;
+      background: var(--white);
+      z-index: 10;
+    }
+    .q-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .q-num { font-size: 13px; font-weight: 700; }
+    .q-count { font-size: 13px; color: #999; }
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: var(--gray2);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--blue);
+      border-radius: 2px;
+      transition: width .35s ease;
+    }
+
+    .q-body { padding: 28px 24px 32px; flex: 1; }
+    .q-text {
+      font-size: 20px;
+      font-weight: 900;
+      line-height: 1.4;
+      letter-spacing: -.5px;
+      margin-bottom: 28px;
+    }
+
+    .answers { display: flex; flex-direction: column; gap: 12px; }
+    .answer-btn {
+      width: 100%;
+      padding: 16px 18px;
+      background: var(--white);
+      border: 2px solid var(--black);
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.5;
+      text-align: left;
+      cursor: pointer;
+      transition: all .15s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .answer-btn:active { transform: scale(.98); }
+    .answer-btn:hover { background: var(--gray); }
+    .answer-btn.selected {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: var(--white);
+    }
+    .answer-emoji { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+
+    .q-footer {
+      padding: 0 24px 32px;
+      display: flex;
+      gap: 10px;
+    }
+    .btn-prev {
+      flex: 1;
+      padding: 16px;
+      background: var(--white);
+      border: 2px solid var(--black);
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-prev:hover { background: var(--gray); }
+    .btn-prev:disabled { opacity: .3; cursor: not-allowed; }
+
+    /* ── LOADING ── */
+    #loading {
+      background: var(--blue);
+      color: var(--white);
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      gap: 24px;
+    }
+    .loading-emoji {
+      width: 100px; height: 100px;
+      border-radius: 50%; object-fit: cover;
+      animation: bounce 0.8s infinite alternate;
+    }
+    @keyframes bounce {
+      from { transform: translateY(0); }
+      to   { transform: translateY(-20px); }
+    }
+    .loading-text { font-size: 20px; font-weight: 700; }
+    .loading-sub   { font-size: 14px; opacity: .5; }
+
+    /* ── RESULT ── */
+    #result { justify-content: flex-start; }
+
+    .result-hero {
+      padding: 52px 28px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .result-badge {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      padding: 5px 14px;
+      border-radius: 20px;
+      border: 2px solid currentColor;
+    }
+    .result-emoji-wrap {
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 20px;
+      border: 3px solid currentColor;
+      overflow: hidden;
+    }
+    .result-emoji-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .result-name {
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: -1px;
+      margin-bottom: 12px;
+    }
+    .result-desc {
+      font-size: 15px;
+      line-height: 1.75;
+      opacity: .85;
+      max-width: 320px;
+    }
+
+    .result-body {
+      background: var(--white);
+      border-radius: 24px 24px 0 0;
+      padding: 28px 24px 40px;
+      flex: 1;
+    }
+
+    .result-tag-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+    .result-tag {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      border: 2px solid var(--black);
+      color: var(--black);
+    }
+
+    .result-btns { display: flex; flex-direction: column; gap: 12px; }
+
+    .btn-ticket {
+      width: 100%;
+      padding: 17px;
+      background: var(--blue);
+      color: var(--white);
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      transition: opacity .15s;
+    }
+    .btn-ticket:active { opacity: .85; }
+
+    .btn-product {
+      width: 100%;
+      padding: 17px;
+      background: var(--yellow);
+      color: var(--black);
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      transition: opacity .15s;
+    }
+    .btn-product:active { opacity: .85; }
+
+    .result-tag-row { color: var(--black); }
+
+    .btn-retry {
+      width: 100%;
+      padding: 17px;
+      background: var(--white);
+      color: var(--black);
+      border: 2px solid var(--black);
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-retry:active { background: var(--gray); }
+
+    .result-footer {
+      background: var(--white);
+      padding: 24px;
+      border-top: 2px solid var(--black);
+      text-align: center;
+      font-size: 12px;
+      color: #999;
+    }
+
+    /* ── RESULT THEMES (screen 전체에 적용) ── */
+    .theme-blue  { background: var(--blue);   color: var(--white); }
+    .theme-yellow{ background: var(--yellow); color: var(--black); }
+    .theme-red   { background: var(--red);    color: var(--white); }
+    .theme-black { background: var(--black);  color: var(--white); }
+    .theme-white { background: #F0F0F0;       color: var(--black); }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ── INTRO ── -->
+  <div id="intro" class="screen active">
+    <div class="intro-top">
+      <img src="logo3_white.png" alt="READY TO KICK" style="height:20px; width:auto; margin-bottom:10px; display:block; object-fit:contain; align-self:flex-start;" />
+      <div class="brand-tag" style="margin-bottom:48px;">Swimming Club 2026</div>
+      <img class="intro-emoji" src="kikkiki.png" alt="킥킥이" />
+      <div class="intro-title">내 수영<br>MBTI는<span>?</span></div>
+      <div class="intro-desc">수영장에서 나는 어떤 타입인지<br>8가지 질문으로 알아보세요!</div>
+      <div class="intro-types">
+        <span class="type-chip">인간물개 킥킥이형</span>
+        <span class="type-chip">교과서형 킥킥이</span>
+        <span class="type-chip">평온한 해달 킥킥이</span>
+        <span class="type-chip">마당발 킥킥이</span>
+        <span class="type-chip">물극복형 킥킥이</span>
+      </div>
+    </div>
+    <button class="btn-start" onclick="startTest()">테스트 시작하기 →</button>
+  </div>
+
+  <!-- ── QUESTION ── -->
+  <div id="question" class="screen">
+    <div class="q-header">
+      <div class="q-meta">
+        <span class="q-num" id="qNum">Q1</span>
+        <span class="q-count" id="qCount">1 / 8</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width:12.5%"></div>
+      </div>
+    </div>
+    <div class="q-body">
+      <div class="q-text" id="qText"></div>
+      <div class="answers" id="answers"></div>
+    </div>
+    <div class="q-footer">
+      <button class="btn-prev" id="btnPrev" onclick="prevQuestion()" disabled>← 이전</button>
+    </div>
+  </div>
+
+  <!-- ── LOADING ── -->
+  <div id="loading" class="screen">
+    <img class="loading-emoji" id="loadingEmoji" src="kikkiki.png" alt="킥킥이" />
+    <div class="loading-text">수영 유형 분석 중...</div>
+    <div class="loading-sub">잠깐만요!</div>
+  </div>
+
+  <!-- ── RESULT ── -->
+  <div id="result" class="screen">
+    <div class="result-hero" id="resultHero">
+      <div class="result-badge" id="resultBadge">나의 수영 유형</div>
+      <div class="result-emoji-wrap" id="resultEmojiWrap">
+        <img id="resultEmoji" src="kikkiki.png" alt="킥킥이" />
+      </div>
+      <div class="result-name" id="resultName"></div>
+      <div class="result-desc" id="resultDesc"></div>
+    </div>
+    <div class="result-body">
+      <div class="result-tag-row" id="resultTags"></div>
+      <div class="result-btns">
+        <a class="btn-ticket" href="#" id="ticketBtn">스위밍클럽 티켓 예매하기</a>
+        <a class="btn-product" href="#" id="productBtn" target="_blank">상품명 바로가기</a>
+        <button class="btn-retry" onclick="retryTest()">다시 테스트하기</button>
+      </div>
+    </div>
+    <div class="result-footer">READY TO KICK × SWIMMING CLUB 2026</div>
+  </div>
+
+</div>
+
+<script>
+// ── 유형별 이미지 매핑 ───────────────────────────────────────
+const TYPE_IMAGES = {
+  수달:    "1-오리-플딥-레드.jpg",
+  오리:    "2-오리-플딥-화이트.jpg",
+  거북이:  "4-오리-플딥-파스텔레인보우.jpg",
+  물개:    "3-오리-플딥-레인보우.jpg",
+  나무늘보:"5-오리-플딥-올크림.jpg"
+};
+
+// ── 데이터 ──────────────────────────────────────────────────
+const QUESTIONS = [
+  {
+    q: "수영장에 도착했다!\n제일 먼저 하는 행동은?",
+    answers: [
+      { emoji: "🦦", text: "바로 워밍업 시작. 몸 풀 시간도 아깝다", type: "수달" },
+      { emoji: "🐤", text: "천천히 준비하면서 오늘 목표를 머릿속으로 정리", type: "오리" },
+      { emoji: "🐢", text: "샤워하고 여유롭게 입수 준비", type: "거북이" },
+      { emoji: "🦭", text: '수영친구한테 "나 왔어~" 카톡부터', type: "물개" },
+      { emoji: "🦥", text: "입수 전 심장이 두근두근... 잠깐 용기 모으는 중", type: "나무늘보" }
+    ]
+  },
+  {
+    q: "수영 실력이 갑자기 늘었다!\n기분이 어때?",
+    answers: [
+      { emoji: "🦦", text: '"더 빨리 칠 수 있겠는데?" 바로 다음 목표 생김', type: "수달" },
+      { emoji: "🐤", text: "뿌듯함. 연습한 보람이 있어", type: "오리" },
+      { emoji: "🐢", text: '"오 좋은데~" 하고 기분 좋게 넘어감', type: "거북이" },
+      { emoji: "🦭", text: "수영친구한테 자랑하러 달려감", type: "물개" },
+      { emoji: "🦥", text: "겁났는데 해냈다! 이 뿌듯함이 제일 좋아", type: "나무늘보" }
+    ]
+  },
+  {
+    q: "자유수영 시간,\n나는?",
+    answers: [
+      { emoji: "🦦", text: "레인 끝에서 끝까지 쉬지 않고 왔다갔다", type: "수달" },
+      { emoji: "🐤", text: "폼 교정하면서 꼼꼼하게 연습", type: "오리" },
+      { emoji: "🐢", text: "내 페이스대로 천천히 즐기며 수영", type: "거북이" },
+      { emoji: "🦭", text: "수영친구랑 같은 레인에서 수다 떨며 이동", type: "물개" },
+      { emoji: "🦥", text: "벽 잡고 발차기부터. 강사님 말대로 하나씩!", type: "나무늘보" }
+    ]
+  },
+  {
+    q: "수영 끝나고\n제일 먼저 생각나는 것은?",
+    answers: [
+      { emoji: "🦦", text: '"다음엔 어떤 영법 연습하지?"', type: "수달" },
+      { emoji: "🐤", text: '"오늘 목표 달성했나?" 셀프 체크', type: "오리" },
+      { emoji: "🐢", text: "따뜻한 샤워", type: "거북이" },
+      { emoji: "🦭", text: "수영친구랑 뭐 먹을지", type: "물개" },
+      { emoji: "🦥", text: "오늘도 물에 들어갔다! 내가 대단하다", type: "나무늘보" }
+    ]
+  },
+  {
+    q: "같이 온 친구가\n물이 무섭다고 한다. 나는?",
+    answers: [
+      { emoji: "🦦", text: '"일단 들어와봐! 적응되면 진짜 좋아" 적극 권유', type: "수달" },
+      { emoji: "🐤", text: "입수 방법 차근차근 알려줌", type: "오리" },
+      { emoji: "🐢", text: '"천천히 해봐~" 하고 옆에서 기다려줌', type: "거북이" },
+      { emoji: "🦭", text: '"그럼 우리 발만 담그고 얘기하자"', type: "물개" },
+      { emoji: "🦥", text: '"나도 처음엔 무서웠어! 일단 발만 담가봐"', type: "나무늘보" }
+    ]
+  },
+  {
+    q: "수영 배우러 왔는데\n선생님이 오늘 쉰다고 한다!",
+    answers: [
+      { emoji: "🦦", text: "혼자서라도 연습. 오늘 목표 있는데", type: "수달" },
+      { emoji: "🐤", text: "유튜브 보면서 혼자 폼 연습", type: "오리" },
+      { emoji: "🐢", text: "그냥 자유롭게 놀다 가야지", type: "거북이" },
+      { emoji: "🦭", text: "수영친구 불러서 수다 타임으로 전환", type: "물개" },
+      { emoji: "🦥", text: "에라 모르겠다, 강사님 없어도 일단 입수!", type: "나무늘보" }
+    ]
+  },
+  {
+    q: "수영복 고를 때\n나의 기준은?",
+    answers: [
+      { emoji: "🦦", text: "기능성 최우선. 저항 적고 잘 빠져야 함", type: "수달" },
+      { emoji: "🐤", text: "예쁘면서도 운동하기 편한 것", type: "오리" },
+      { emoji: "🐢", text: "편하고 오래 입을 수 있는 것", type: "거북이" },
+      { emoji: "🦭", text: "수영친구랑 커플 수영복도 고려해봄", type: "물개" },
+      { emoji: "🦥", text: "아직은 수린이! 강사님이 추천하는 걸로 고르기!", type: "나무늘보" }
+    ]
+  },
+  {
+    q: "스위밍클럽 행사에 왔다!\n오늘 목표는?",
+    answers: [
+      { emoji: "🦦", text: "최대한 많이 수영하기", type: "수달" },
+      { emoji: "🐤", text: "새로운 영법 하나 배워가기", type: "오리" },
+      { emoji: "🐢", text: "여유롭게 즐기다 가기", type: "거북이" },
+      { emoji: "🦭", text: "새로운 수영친구 3명 사귀기", type: "물개" },
+      { emoji: "🦥", text: "물에 들어가는 것 자체가 오늘의 목표!", type: "나무늘보" }
+    ]
+  }
+];
+
+const RESULTS = {
+  수달: {
+    img: "1-오리-플딥-레드.jpg",
+    name: "인간물개 킥킥이형",
+    desc: "물 밖보다 물속이 편한 유형이에요. 수영장에서 가장 오래 있는 것도, 가장 빨리 입수하는 것도 바로 당신! 물이 제일 편한 진짜 수영인이에요.",
+    tags: ["#인간물개", "#물이제일편해", "#레인장인", "#물속생활"],
+    heroClass: "theme-blue",
+    productName: "FLOWER DIP (red)",
+    productUrl: "https://readytokick.com/product/flower-dip-red/43/category/133/display/1/"
+  },
+  오리: {
+    img: "2-오리-플딥-화이트.jpg",
+    name: "교과서형 킥킥이",
+    desc: "영법의 정석을 추구하는 완벽주의자! 강사님이 말씀하신 1cm의 차이도 절대 놓치지 않는 꼼꼼한 수영인이에요. 기초가 탄탄해서 언젠간 진짜 빠를 거예요.",
+    tags: ["#교과서수영", "#폼이최우선", "#1cm의차이", "#완벽주의"],
+    heroClass: "theme-yellow",
+    productName: "FLOWER DIP (white)",
+    productUrl: "https://readytokick.com/product/flower-dip-white/39/category/133/display/1/"
+  },
+  거북이: {
+    img: "4-오리-플딥-파스텔레인보우.jpg",
+    name: "평온한 해달 킥킥이",
+    desc: "기록보다는 물 속의 평화가 중요한 타입이에요. 바쁜 세상 속에서 수영장만큼은 나만의 힐링 공간! 둥둥 떠서 물 속 평화를 만끽하는 진정한 힐링파예요.",
+    tags: ["#물속평화", "#힐링수영", "#기록보다평온", "#나만의공간"],
+    heroClass: "theme-white",
+    productName: "FLOWER DIP (pastel rainbow)",
+    productUrl: "https://readytokick.com/product/flower-dip-pastel-rainbow/273/category/133/display/1/"
+  },
+  물개: {
+    img: "3-오리-플딥-레인보우.jpg",
+    name: "마당발 킥킥이",
+    desc: "앞 레인, 뒤 레인 모르는 사람이 없는 수영장 인싸! 처음 온 사람도 금방 친해지고, 수영장 분위기를 밝게 만드는 존재예요. 오늘도 새 친구 한 명 더!",
+    tags: ["#마당발", "#수영장인싸", "#새친구환영", "#레인연결고리"],
+    heroClass: "theme-red",
+    productName: "FLOWER DIP (rainbow)",
+    productUrl: "https://readytokick.com/product/flower-dip-rainbow/179/category/133/display/1/"
+  },
+  나무늘보: {
+    img: "5-오리-플딥-올크림.jpg",
+    name: "물극복형 킥킥이",
+    desc: "물이 아직 무섭지만 용감하게 도전하는 수영 초보예요! 입수 전 두근거리는 심장, 강사님 말씀 한 마디 한 마디가 법이에요. 겁나지만 물에 들어가고 나면 누구보다 뿌듯한 진짜 성장형 수영인이에요.",
+    tags: ["#물극복중", "#입수전두근두근", "#강사님말이법", "#해냈다뿌듯"],
+    heroClass: "theme-black",
+    productName: "FLOWER DIP (all cream)",
+    productUrl: "https://readytokick.com/product/flower-dip-all-cream/262/category/133/display/1/"
+  }
+};
+
+// ── 상태 ──────────────────────────────────────────────────
+let current = 0;
+let scores = { 수달: 0, 오리: 0, 거북이: 0, 물개: 0, 나무늘보: 0 };
+let selected = new Array(8).fill(null);
+
+// ── 화면 전환 ──────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ── 테스트 시작 ────────────────────────────────────────────
+function startTest() {
+  current = 0;
+  scores = { 수달: 0, 오리: 0, 거북이: 0, 물개: 0, 나무늘보: 0 };
+  selected = new Array(8).fill(null);
+  renderQuestion();
+  showScreen('question');
+}
+
+// ── 질문 렌더 ──────────────────────────────────────────────
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  const total = QUESTIONS.length;
+
+  document.getElementById('qNum').textContent = `Q${current + 1}`;
+  document.getElementById('qCount').textContent = `${current + 1} / ${total}`;
+  document.getElementById('progressFill').style.width = `${((current + 1) / total) * 100}%`;
+  document.getElementById('qText').textContent = q.q;
+  document.getElementById('btnPrev').disabled = current === 0;
+
+  const answersEl = document.getElementById('answers');
+  answersEl.innerHTML = '';
+
+  // 답변 순서 섞기 (재현 가능하게 질문 인덱스 기반)
+  const shuffled = [...q.answers];
+
+  shuffled.forEach((ans, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'answer-btn' + (selected[current] === ans.type ? ' selected' : '');
+    btn.innerHTML = `<img class="answer-emoji" src="${TYPE_IMAGES[ans.type]}" alt="킥킥이" /><span>${ans.text}</span>`;
+    btn.onclick = () => selectAnswer(ans.type, btn);
+    answersEl.appendChild(btn);
+  });
+}
+
+// ── 답변 선택 ──────────────────────────────────────────────
+function selectAnswer(type, btn) {
+  // 이전 선택 취소
+  if (selected[current]) {
+    scores[selected[current]]--;
+  }
+
+  // 새 선택
+  selected[current] = type;
+  scores[type]++;
+
+  document.querySelectorAll('.answer-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+
+  // 잠깐 후 다음 질문
+  setTimeout(() => {
+    if (current < QUESTIONS.length - 1) {
+      current++;
+      renderQuestion();
+    } else {
+      showResult();
+    }
+  }, 400);
+}
+
+// ── 이전 질문 ──────────────────────────────────────────────
+function prevQuestion() {
+  if (current > 0) {
+    if (selected[current]) {
+      scores[selected[current]]--;
+      selected[current] = null;
+    }
+    current--;
+    renderQuestion();
+  }
+}
+
+// ── 결과 계산 ──────────────────────────────────────────────
+function showResult() {
+  showScreen('loading');
+
+  setTimeout(() => {
+    const winner = Object.entries(scores).sort((a, b) => b[1] - a[1])[0][0];
+    const r = RESULTS[winner];
+
+    // 테마를 result 전체 화면에 적용
+    const resultScreen = document.getElementById('result');
+    resultScreen.className = `screen active ${r.heroClass}`;
+
+    document.getElementById('resultHero').className = 'result-hero';
+    document.getElementById('resultBadge').textContent = '나의 수영 유형';
+    document.getElementById('resultEmoji').src = r.img;
+    document.getElementById('resultEmoji').alt = r.name;
+    document.getElementById('resultName').textContent = r.name;
+    document.getElementById('resultDesc').textContent = r.desc;
+
+    const tagsEl = document.getElementById('resultTags');
+    tagsEl.innerHTML = r.tags.map(t =>
+      `<span class="result-tag">${t}</span>`
+    ).join('');
+
+    const productBtn = document.getElementById('productBtn');
+    productBtn.href = r.productUrl;
+    productBtn.textContent = `${r.productName} 바로가기`;
+
+    // showScreen 대신 직접 active 처리 (theme class 유지를 위해)
+    document.querySelectorAll('.screen').forEach(s => {
+      if (s.id !== 'result') s.classList.remove('active');
+    });
+    window.scrollTo(0, 0);
+  }, 1800);
+}
+
+// ── 다시하기 ──────────────────────────────────────────────
+function retryTest() {
+  startTest();
+}
+
+// ── 카카오 공유 ───────────────────────────────────────────
+function shareKakao() {
+  const winner = Object.entries(scores).sort((a, b) => b[1] - a[1])[0][0];
+  const r = RESULTS[winner];
+
+  // ⚠️ 아래 'YOUR_KAKAO_APP_KEY'를 카카오 개발자 콘솔에서 발급받은 JavaScript 앱 키로 교체하세요
+  // developers.kakao.com → 내 애플리케이션 → 앱 키 → JavaScript 키
+  if (typeof Kakao === 'undefined' || !Kakao.isInitialized()) {
+    try {
+      Kakao.init('YOUR_KAKAO_APP_KEY');
+    } catch(e) {
+      alert('카카오 공유 기능을 사용하려면 앱 키 설정이 필요해요.\n(개발자 문의)');
+      return;
+    }
+  }
+
+  Kakao.Share.sendDefault({
+    objectType: 'text',
+    text: `나의 수영 MBTI는 ${r.emoji} ${r.name}!\n\n${r.desc}\n\n나의 수영 유형은 뭘까? 👇`,
+    link: {
+      mobileWebUrl: window.location.href,
+      webUrl: window.location.href,
+    },
+    buttonTitle: '나도 테스트하기 🏊'
+  });
+}
+
+// ── 초기화 ────────────────────────────────────────────────
+window.onload = () => {
+  if (typeof Kakao !== 'undefined') {
+    try { Kakao.init('YOUR_KAKAO_APP_KEY'); } catch(e) {}
+  }
+};
+</script>
+</body>
+</html>
