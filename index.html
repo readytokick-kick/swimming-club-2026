@@ -285,6 +285,27 @@
       color: var(--black);
     }
 
+    .result-program {
+      background: var(--gray);
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin-bottom: 24px;
+    }
+    .result-program-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #999;
+      margin-bottom: 6px;
+    }
+    .result-program-name {
+      font-size: 16px;
+      font-weight: 900;
+      color: var(--black);
+      letter-spacing: -.3px;
+    }
+
     .result-btns { display: flex; flex-direction: column; gap: 12px; }
 
     .btn-ticket {
@@ -306,7 +327,7 @@
     }
     .btn-ticket:active { opacity: .85; }
 
-    .btn-product {
+    .btn-form {
       width: 100%;
       padding: 17px;
       background: var(--yellow);
@@ -322,7 +343,7 @@
       text-decoration: none;
       transition: opacity .15s;
     }
-    .btn-product:active { opacity: .85; }
+    .btn-form:active { opacity: .85; }
 
     .result-tag-row { color: var(--black); }
 
@@ -418,9 +439,13 @@
     </div>
     <div class="result-body">
       <div class="result-tag-row" id="resultTags"></div>
+      <div class="result-program">
+        <div class="result-program-label">스위밍클럽 추천 프로그램</div>
+        <div class="result-program-name" id="resultProgram"></div>
+      </div>
       <div class="result-btns">
         <a class="btn-ticket" href="#" id="ticketBtn">스위밍클럽 티켓 예매하기</a>
-        <a class="btn-product" href="#" id="productBtn" target="_blank">상품명 바로가기</a>
+        <a class="btn-form" id="productBtn" href="https://docs.google.com/forms/d/116av0t7JlRtiVJRluOv8Ob5L_DRwB8_WE7Lozfajmeg/viewform" target="_blank">내 수영 성향 레디투킥에 알려주기</a>
         <button class="btn-retry" onclick="retryTest()">다시 테스트하기</button>
       </div>
     </div>
@@ -530,6 +555,7 @@ const RESULTS = {
     desc: "물 밖보다 물속이 편한 유형이에요. 수영장에서 가장 오래 있는 것도, 가장 빨리 입수하는 것도 바로 당신! 물이 제일 편한 진짜 수영인이에요.",
     tags: ["#인간물개", "#물이제일편해", "#레인장인", "#물속생활"],
     heroClass: "theme-blue",
+    program: "3부 — 아쿠아로빅 & 킥킥대회 & 명상",
     productName: "FLOWER DIP (red)",
     productUrl: "https://readytokick.com/product/flower-dip-red/43/category/133/display/1/"
   },
@@ -539,6 +565,7 @@ const RESULTS = {
     desc: "영법의 정석을 추구하는 완벽주의자! 강사님이 말씀하신 1cm의 차이도 절대 놓치지 않는 꼼꼼한 수영인이에요. 기초가 탄탄해서 언젠간 진짜 빠를 거예요.",
     tags: ["#교과서수영", "#폼이최우선", "#1cm의차이", "#완벽주의"],
     heroClass: "theme-yellow",
+    program: "1부 — 낭독극 〈자유수영〉과 진짜 자유수영",
     productName: "FLOWER DIP (white)",
     productUrl: "https://readytokick.com/product/flower-dip-white/39/category/133/display/1/"
   },
@@ -548,6 +575,7 @@ const RESULTS = {
     desc: "기록보다는 물 속의 평화가 중요한 타입이에요. 바쁜 세상 속에서 수영장만큼은 나만의 힐링 공간! 둥둥 떠서 물 속 평화를 만끽하는 진정한 힐링파예요.",
     tags: ["#물속평화", "#힐링수영", "#기록보다평온", "#나만의공간"],
     heroClass: "theme-white",
+    program: "1부 — 낭독극 〈자유수영〉과 진짜 자유수영",
     productName: "FLOWER DIP (pastel rainbow)",
     productUrl: "https://readytokick.com/product/flower-dip-pastel-rainbow/273/category/133/display/1/"
   },
@@ -557,6 +585,7 @@ const RESULTS = {
     desc: "앞 레인, 뒤 레인 모르는 사람이 없는 수영장 인싸! 처음 온 사람도 금방 친해지고, 수영장 분위기를 밝게 만드는 존재예요. 오늘도 새 친구 한 명 더!",
     tags: ["#마당발", "#수영장인싸", "#새친구환영", "#레인연결고리"],
     heroClass: "theme-red",
+    program: "3부 — 아쿠아로빅 & 킥킥대회 & 명상",
     productName: "FLOWER DIP (rainbow)",
     productUrl: "https://readytokick.com/product/flower-dip-rainbow/179/category/133/display/1/"
   },
@@ -566,6 +595,7 @@ const RESULTS = {
     desc: "물이 아직 무섭지만 용감하게 도전하는 수영 초보예요! 입수 전 두근거리는 심장, 강사님 말씀 한 마디 한 마디가 법이에요. 겁나지만 물에 들어가고 나면 누구보다 뿌듯한 진짜 성장형 수영인이에요.",
     tags: ["#물극복중", "#입수전두근두근", "#강사님말이법", "#해냈다뿌듯"],
     heroClass: "theme-black",
+    program: "3부 — 아쿠아로빅 & 킥킥대회 & 명상",
     productName: "FLOWER DIP (all cream)",
     productUrl: "https://readytokick.com/product/flower-dip-all-cream/262/category/133/display/1/"
   }
@@ -679,9 +709,8 @@ function showResult() {
       `<span class="result-tag">${t}</span>`
     ).join('');
 
-    const productBtn = document.getElementById('productBtn');
-    productBtn.href = r.productUrl;
-    productBtn.textContent = `${r.productName} 바로가기`;
+    document.getElementById('resultProgram').textContent = r.program;
+
 
     // showScreen 대신 직접 active 처리 (theme class 유지를 위해)
     document.querySelectorAll('.screen').forEach(s => {
